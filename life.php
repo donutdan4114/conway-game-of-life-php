@@ -8,7 +8,6 @@
 
 namespace Life;
 
-include 'src/Cell.php';
 include 'src/Game.php';
 include 'src/Grid.php';
 

@@ -82,7 +82,7 @@ class Game {
     $y = $centerY;
     while ($c = fgetc($file)) {
       if ($c == 'O') {
-        $this->grid->cells[$y][$x]->setAlive();
+        $this->grid->cells[$y][$x] = 1;
       }
       if ($c == "\n") {
         $y++;
