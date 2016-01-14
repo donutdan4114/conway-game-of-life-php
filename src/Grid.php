@@ -17,10 +17,10 @@ class Grid {
     for ($x = 0; $x < $this->width; $x++) {
       for ($y = 0; $y < $this->height; $y++) {
         if ($randomize) {
-          $this->cells[$y][$x] = new Cell($this->getRandomState($rand_max));
+          $this->cells[$y][$x] = $this->getRandomState($rand_max);
         }
         else {
-          $this->cells[$y][$x] = new Cell();
+          $this->cells[$y][$x] = 0;
         }
       }
     }
@@ -31,7 +31,7 @@ class Grid {
     $count = 0;
     foreach ($this->cells as $y => $row) {
       foreach ($row as $x => $cell) {
-        if ($cell->isAlive()) {
+        if ($cell) {
           $count++;
         }
       }

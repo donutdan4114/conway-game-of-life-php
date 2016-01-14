@@ -115,10 +115,10 @@ class Game {
         // All cell activity is determined by the neighbor count.
         $neighbor_count = $this->getAliveNeighborCount($x, $y);
 
-        if ($cells[$y][$x]->isAlive() && ($neighbor_count < 2 || $neighbor_count > 3)) {
+        if ($cells[$y][$x] && ($neighbor_count < 2 || $neighbor_count > 3)) {
           $kill_queue[] = [$y, $x];
         }
-        if ($cells[$y][$x]->isDead() && $neighbor_count === 3) {
+        if (!$cells[$y][$x] && $neighbor_count === 3) {
           $born_queue[] = [$y, $x];
         }
 
@@ -126,11 +126,11 @@ class Game {
     }
 
     foreach ($kill_queue as $c) {
-      $cells[$c[0]][$c[1]]->kill();
+      $cells[$c[0]][$c[1]] = 0;
     }
 
     foreach ($born_queue as $c) {
-      $cells[$c[0]][$c[1]]->setAlive();
+      $cells[$c[0]][$c[1]] = 1;
     }
   }
 
@@ -159,7 +159,7 @@ class Game {
           // Out of range.
           continue;
         }
-        if ($this->grid->cells[$y2][$x2]->isAlive()) {
+        if ($this->grid->cells[$y2][$x2]) {
           $alive_count += 1;
         }
       }
@@ -182,7 +182,7 @@ class Game {
     foreach ($this->grid->cells as $y => $row) {
       foreach ($row as $x => $cell) {
         /** @var Cell $cell */
-        print ($cell->isAlive() ? $this->opts['cell'] : $this->opts['empty']);
+        print ($cell ? $this->opts['cell'] : $this->opts['empty']);
       }
       // Done with the row.
       print "\n";
