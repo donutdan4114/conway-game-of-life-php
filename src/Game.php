@@ -18,7 +18,6 @@ class Game {
   private $opts = [];
   private $start_time = 0;
   private $frame_count = 0;
-  private $live_cell_counts = [];
 
   private function setDefaults(array $opts) {
     $defaults = [
@@ -208,10 +207,6 @@ class Game {
    */
   private function getStatus() {
     $live_cells = $this->grid->countLiveCells();
-    $this->live_cell_counts[] = $live_cells;
-    if (count($this->live_cell_counts) > 5) {
-      $this->live_cell_counts = [];
-    }
     $elapsed_time = time() - $this->start_time;
     if ($elapsed_time > 0) {
       $fps = number_format($this->frame_count / $elapsed_time, 1);
