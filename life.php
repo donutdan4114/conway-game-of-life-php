@@ -47,4 +47,4 @@ if (isset($argv[1])) {
 $game = new Game($opts);
 $game->loop();
 
-print 'Bye!';
+print "\nGame Over!\n\n";

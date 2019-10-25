@@ -201,7 +201,7 @@ class Game {
     $this->generation_hashes[$pointer] = $hash;
     $pointer++;
 
-    if ($pointer > 10) {
+    if ($pointer > 20) {
       $pointer = 0;
     }
   }
