@@ -21,27 +21,15 @@ class Game {
 
   private $frame_count = 0;
 
-  private function setDefaults(array $opts) {
-    $defaults = [
-      'timeout' => 5000,
-      'rand_max' => 5,
-      'realtime' => TRUE,
-      'max_frame_count' => 0,
-      'template' => NULL,
-      'random' => TRUE,
-      'width' => exec('tput cols'),
-      'height' => exec('tput lines') - 3,
-      'cell' => 'O',
-      'empty' => ' ',
-    ];
-    if (isset($opts['template']) && !isset($opts['random'])) {
-      // Disable random when template is set.
-      $opts['random'] = FALSE;
-    }
-    $opts += $defaults;
-    $this->opts += $opts;
-  }
+  private $generation_hashes = [];
 
+  /**
+   * Game constructor.
+   *
+   * Creates a new game.
+   *
+   * @param array $opts
+   */
   public function __construct(array $opts) {
     $this->setDefaults($opts);
     $this->start_time = time();
@@ -53,6 +41,38 @@ class Game {
     }
   }
 
+  /**
+   * Merges the player $opts and the default $opts.
+   *
+   * @param array $opts
+   */
+  private function setDefaults(array $opts) {
+    $defaults = [
+      'timeout' => 5000,
+      'rand_max' => 5,
+      'realtime' => TRUE,
+      'max_frame_count' => 0,
+      'template' => NULL,
+      'keep_alive' => 0,
+      'random' => TRUE,
+      'width' => exec('tput cols'),
+      'height' => exec('tput lines') - 3,
+      'cell' => 'O',
+      'empty' => ' ',
+    ];
+
+    if (isset($opts['template']) && !isset($opts['random'])) {
+      // Disable random when template is set.
+      $opts['random'] = FALSE;
+    }
+
+    $opts += $defaults;
+    $this->opts += $opts;
+  }
+
+  /**
+   * Start the game loop to render the Game of Life.
+   */
   public function loop() {
     while (TRUE) {
       $this->frame_count++;
@@ -66,7 +86,11 @@ class Game {
       if ($this->opts['max_frame_count'] && $this->frame_count >= $this->opts['max_frame_count']) {
         break;
       }
+      if (!$this->opts['keep_alive'] && $this->isEndlessLoop()) {
+        break;
+      }
     }
+
     if (!$this->opts['realtime']) {
       // Draw the last frame.
       $this->clear();
@@ -74,6 +98,11 @@ class Game {
     }
   }
 
+  /**
+   * Set a template from the /templates folder.
+   *
+   * @param string $name
+   */
   public function setTemplate($name) {
     $template = $name . '.txt';
     $path = 'templates/' . $template;
@@ -122,7 +151,6 @@ class Game {
         if (!$cells[$y][$x] && $neighbor_count === 3) {
           $born_queue[] = [$y, $x];
         }
-
       }
     }
 
@@ -132,6 +160,49 @@ class Game {
 
     foreach ($born_queue as $c) {
       $cells[$c[0]][$c[1]] = 1;
+    }
+
+    if (!$this->opts['keep_alive']) {
+      $this->trackGeneration();
+    }
+  }
+
+  /**
+   * Checks if we are in an endless loop by comparing the past few hashes.
+   */
+  private function isEndlessLoop() {
+    foreach ($this->generation_hashes as $hash) {
+      $found = -1;
+      foreach ($this->generation_hashes as $hash2) {
+        if ($hash === $hash2) {
+          $found++;
+        }
+      }
+      if ($found >= 3) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Tracks a generation so we can determine if we are looping later on.
+   *
+   * We do this by building an array of grid hashes and comparing them all each frame.
+   */
+  private function trackGeneration() {
+    static $pointer;
+
+    if (!isset($pointer)) {
+      $pointer = 0;
+    }
+
+    $hash = md5(json_encode($this->grid->cells));
+    $this->generation_hashes[$pointer] = $hash;
+    $pointer++;
+
+    if ($pointer > 10) {
+      $pointer = 0;
     }
   }
 
@@ -217,5 +288,4 @@ class Game {
     }
     return " Gen: {$this->frame_count} | Cells: $live_cells | Elapsed Time: {$elapsed_time}s | FPS: {$fps}";
   }
-
 }

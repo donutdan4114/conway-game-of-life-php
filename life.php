@@ -24,6 +24,7 @@ if (isset($argv[1]) && $argv[1] == 'help') {
   print "  - rand_max (default=5): Chances of a cell being alive. Lower is more alive cells" . PHP_EOL;
   print "  - timeout (default=5000): Number of microseconds between frame renders" . PHP_EOL;
   print "  - realtime (default=1): Whether to render the grid in realtime, or just run calculations" . PHP_EOL;
+  print "  - keep_alive (default=0): Set to 1 to keep the game running even when an endless loop is detected" . PHP_EOL;
   print "  - max_frame_count (default=0): The max number of frames to render" . PHP_EOL;
   print "  - template: Loads a template from a txt file. See /templates folder" . PHP_EOL;
   print "  - cell (default=O): Alive cell character" . PHP_EOL;
