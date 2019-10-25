@@ -16,7 +16,9 @@ namespace Life;
 class Game {
 
   private $opts = [];
+
   private $start_time = 0;
+
   private $frame_count = 0;
 
   private function setDefaults(array $opts) {
@@ -179,12 +181,11 @@ class Game {
    */
   private function render() {
     foreach ($this->grid->cells as $y => $row) {
+      $print_row = '';
       foreach ($row as $x => $cell) {
-        /** @var Cell $cell */
-        print ($cell ? $this->opts['cell'] : $this->opts['empty']);
+        $print_row .= ($cell ? $this->opts['cell'] : $this->opts['empty']);
       }
-      // Done with the row.
-      print "\n";
+      print $print_row . "\n";
     }
   }
 
